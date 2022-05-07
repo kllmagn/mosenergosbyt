@@ -9,14 +9,14 @@ with open(path.join(this_directory, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='mosenergosbyt',
     packages=['mosenergosbyt'],
-    version='0.1.16',
+    version='1.0.0',
     license='MIT',
     description='api для работы с порталом мосэнергосбыт',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='@kkuryshev',
     author_email='kkurishev@gmail.com',
-    url='https://github.com/kkuryshev/mosenergosbyt',
+    url='https://gitflic.ru/project/alexbratchik/mosenergosbyt',
     keywords=['mosenergosbyt', 'MEANINGFULL', 'KEYWORDS'],
     install_requires=[
         'requests',
