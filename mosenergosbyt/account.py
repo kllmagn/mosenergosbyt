@@ -1,41 +1,120 @@
-from mosenergosbyt.meter import Meter
+
+from datetime import datetime
+from time import strftime
+from mosenergosbyt.exceptions import *
+
 import logging
+from dateutil.relativedelta import relativedelta
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class AccountException(BaseException):
-    pass
-
-
 class Account:
-    def __init__(self, session):
-        self.session = session
-        self.__meter_list = []
-
-    def get_info(self,with_measure=False,indications=False,balance=False) -> None:
-        """
-        Получение базовой информации клиента с портала, которая нужна для последующих вызовов
-        :return:
-        """
-        self.__meter_list = []
-        data = self.session.call('LSList')
-        for item in data:
-            obj = Meter.parse(session=self.session, **item)
-            if with_measure:
-                obj.get_measure_list()
-                obj.get_payment_list()
-            if indications:
-                obj.get_indication()
-            if balance:
-                obj.get_balance()
-
-            self.__meter_list.append(obj)
+    def __init__(self, **kwargs):
+        self.session = kwargs['session']
+        self.nn_ls = kwargs['nn_ls']
+        self.__vl_provider = kwargs['vl_provider']
+        self.id_service = kwargs.get('id_service', None)
+        self.nm_ls_group_full = kwargs.get('nm_ls_group_full', None)
+        self.nm_provider = kwargs.get('nm_provider', None)
+        self.nn_days = None
+        self.balance = {}
+        self.counters = []
+        self.payments = []
+        self.proxy = "smorodinaTransProxy"
 
     @property
-    def meter_list(self):
-        if not self.__meter_list:
+    def vl_provider(self):
+        if not self.__vl_provider:
             raise AccountException(
-                'Отсутствует информация о счетчиках'
+                'для получения списка переданных показаний нужно получить информацию о лицевом счете'
             )
-        return {item.nn_ls: item for item in self.__meter_list}
+        return self.__vl_provider
+
+    @classmethod
+    def parse(cls, **kwargs):
+        return cls(**kwargs)
+
+    def get_counters(self, with_measure=False) -> list:
+        """
+        Получение списка счетчиков
+        :return:
+        """
+
+        try:
+            data = self.__post_proxy_query(proxyquery="AbonentEquipment")
+        except SessionTimeout:
+            _LOGGER.warning('произошел таймаут обращения к порталу при получении списка счетчиков')
+            return []
+
+        self.counters = data
+        return self.counters
+
+    def get_balance(self) -> dict:
+        try:
+            data = self.__post_proxy_query(proxyquery='AbonentCurrentBalance')
+        except SessionTimeout:
+            _LOGGER.warning('произошел таймаут обращения к порталу при получении баланса')
+            return {}
+        self.balance = data[0]
+        return self.balance
+
+    def get_payments(self, period=0) -> list:
+        """
+        Получение списка оплат
+        :return:
+        """
+        try:
+            last_date = datetime.now()
+            n_months_ago = datetime.today() - relativedelta(months=period)
+
+            querydata = {'dt_st': self.__format_date(n_months_ago),
+                         'dt_en': self.__format_date(last_date)}
+
+            data = self.__post_proxy_query(proxyquery='AbonentPays', proxyquerydata=querydata)
+        except SessionTimeout:
+            _LOGGER.warning('произошел таймаут обращения к порталу при получении списка оплат')
+            return []
+
+        self.payments = data
+
+        return self.payments
+
+    def upload_reading(self, nm_counter, reading) -> str:
+        """
+        Передача показаний
+        :param nm_counter: номер счета
+        :param reading: показания
+        :return:
+        """
+
+        cns = [item for item in self.counters if item['nm_counter'] == nm_counter]
+
+        if len(cns) == 0:
+            return "Счетчик %s не найден для лицевого счета %s" % (nm_counter, self.nn_ls)
+
+        counter = cns[0]
+
+        return ""
+
+    def __post_proxy_query(self, proxyquery, proxyquerydata=None) -> dict:
+        """
+        Запрос к порталу для получения списка оплат/переданных показаний
+        :param proxyquery: тип запроса
+        :return:
+        """
+
+        if proxyquerydata is None:
+            proxyquerydata = {}
+
+        proxyquerydata.update({
+            'plugin': self.proxy,
+            'proxyquery': proxyquery,
+            'vl_provider': self.vl_provider
+        })
+
+        return self.session.call(self.proxy, data=proxyquerydata, timeout=5.0)
+
+    @staticmethod
+    def __format_date(d):
+        return "%s%s" % (d.strftime('%Y-%m-%dT%H:%M:%S'), strftime("%z"))

@@ -5,3 +5,4 @@ MANIFEST
 tests
 .vscode
 mosenergosbyt.egg-info
+/venv/

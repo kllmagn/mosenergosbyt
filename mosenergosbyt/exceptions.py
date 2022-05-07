@@ -10,5 +10,5 @@ class SessionTimeout(SessionException):
     pass
 
 
-class MeterException(BaseException):
+class AccountException(BaseException):
     pass

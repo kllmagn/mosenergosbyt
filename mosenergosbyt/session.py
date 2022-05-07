@@ -20,6 +20,7 @@ def check_response(resp):
         )
 
     j = resp.json()
+    print(json.dumps(j))
     _LOGGER.debug(j)
     if not j['success']:
         if j['err_code'] == 201:
@@ -27,7 +28,7 @@ def check_response(resp):
                 j['err_text']
             )
         raise SessionException(
-            'ошибка авторизации'
+            'ошибка авторизации: %s' % j['err_text']
         )
 
     if 'data' not in j:
@@ -47,7 +48,7 @@ def check_auth_response(resp):
     data = resp[0]
     if data['kd_result']:
         raise SessionException(
-            'ошибка авторизации: %s' % data['nm_result']
+            'ошибка авторизации (%s): %s' % (data['kd_result'], data['nm_result'])
         )
 
     return data
@@ -71,20 +72,21 @@ class Session:
                 'login': self.login,
                 'psw': self.password,
                 'vl_device_info': json.dumps(
-                    {"appver": "1.15.0", "type": "browser",
-                     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) " +
-                                  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.122 Safari/537.36"
+                    {"appver": "1.28.1", "type": "browser",
+                     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4; rv:99.0) " +
+                                  "Gecko/20100101 Firefox/99.0"
                      }
                 )
             }
         )
-
         data = check_auth_response(resp)
+        # print(json.dumps(data))
+        # print(data['nm_result'])
 
         self.token = data['session']
         self.id_profile = data['id_profile']
 
-        self.call('Init')
+        self.call(query='Init')
 
     def call(self, query, action='sql', data=None, **kwargs) -> dict:
         """
