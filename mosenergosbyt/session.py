@@ -7,15 +7,6 @@ from mosenergosbyt.exceptions import *
 import json
 
 
-# _LOGGER = logging.getLogger(__name__)
-#
-# if _LOGGER.getEffectiveLevel() == 10:  # DEBUG
-#     import http
-#     http_client = logging.getLogger('urllib3.connectionpool')
-#     http_client.setLevel(logging.INFO)
-#     http.client.HTTPConnection.debuglevel = 1
-
-
 class Session:
     __session = None
 

@@ -1,5 +1,6 @@
 .idea
-dist
+dist/
+build/
 mosenergosbyt/__pycache__
 MANIFEST
 tests

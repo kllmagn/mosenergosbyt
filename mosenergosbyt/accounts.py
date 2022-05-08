@@ -18,6 +18,12 @@ class Accounts:
              period=0) -> None:
         """
         Получение счетов клиента с портала с дополнительной информацией.
+        :param account: номер лицевого счета. Возможно указвать только первые несколько знаков, либо пустую строку.
+                        Если номер счета не указан, будут загружены все счета для указанного пользователя
+        :param with_counters: если True то будет загружена информация по всем имеющимся счетчикам
+        :param with_balance: если True то загружается информация по текущему балансу
+        :param with_payments: еслм True то загружается инофрмация по последним платежам
+        :param period: количество месяцев назад, за которое надо выводить информацию по платежам
         :return:
         """
         self.__list = []
@@ -40,5 +46,10 @@ class Accounts:
         return self.__list
 
     def get_account(self, nn_ls):
+        """
+        Возвращает лцевой счет по номеру счета
+        :param nn_ls: номер лицевого счета
+        :return:
+        """
         accs = [item for item in self.__list if getattr(item, 'nn_ls') == nn_ls]
         return None if len(accs) == 0 else accs[0]

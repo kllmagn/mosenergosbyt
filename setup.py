@@ -34,6 +34,6 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     entry_points = {
-        'console_scripts': ['mosenergosbyt=mosenergosbyt.command_line:main'],
+        'console_scripts': ['mosenergosbyt=mosenergosbyt.__main__:main'],
     }
 )

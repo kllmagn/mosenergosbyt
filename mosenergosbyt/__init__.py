@@ -1,3 +1,4 @@
-from .accounts import Accounts, AccountException
-from .session import Session, SessionException
-from .account import Account
+# __init__.py
+
+# Version of the realpython-reader package
+__version__ = "1.0.1"

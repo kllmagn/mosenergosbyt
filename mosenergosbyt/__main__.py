@@ -1,8 +1,9 @@
-
-from mosenergosbyt import Session, Accounts
 import argparse
 from datetime import datetime
 import json
+
+from mosenergosbyt.session import Session
+from mosenergosbyt.accounts import Accounts
 
 
 def converter(obj):
@@ -77,7 +78,7 @@ def main():
                 exit(1)
             else:
                 session.logger.info("Показания переданы для аккаунта/счетчика %s / %s: %f" %
-                      (args.account, args.counter, args.counter_reading))
+                                    (args.account, args.counter, args.counter_reading))
 
     except SystemExit:
         pass
