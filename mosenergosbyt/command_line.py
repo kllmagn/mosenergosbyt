@@ -1,11 +1,8 @@
-import sys
 
 from mosenergosbyt import Session, Accounts
 import argparse
 from datetime import datetime
 import json
-
-import logging
 
 
 def converter(obj):
