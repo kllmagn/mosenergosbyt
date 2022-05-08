@@ -8,5 +8,5 @@
 * Получение списка оплат
 * Передача показаний за текущий месяц
 
-# Автор: kkurishev@gmail.com
-# Исправил и доработал: abratchik@gmail.com
+# Автор: @kkuryshev <kkurishev@gmail.com>
+# Исправил и доработал: @abratchik <abratchik@gmail.com>

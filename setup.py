@@ -11,12 +11,12 @@ setup(
     packages=['mosenergosbyt'],
     version='1.0.0',
     license='MIT',
-    description='api для работы с порталом мосэнергосбыт',
+    description='API для работы с порталом мосэнергосбыт',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='@kkuryshev',
     author_email='kkurishev@gmail.com',
-    url='https://gitflic.ru/project/alexbratchik/mosenergosbyt',
+    url='https://gitflic.ru/project/alexbratchik/mosenergosbyt.git',
     keywords=['mosenergosbyt', 'MEANINGFULL', 'KEYWORDS'],
     install_requires=[
         'requests',
@@ -24,7 +24,7 @@ setup(
         'python-dateutil'
     ],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 3 - Beta',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: MIT License',

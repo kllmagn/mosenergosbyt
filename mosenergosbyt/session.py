@@ -1,57 +1,19 @@
 import logging
+import sys
+
 from requests import session
 from requests.exceptions import Timeout, RequestException
 from mosenergosbyt.exceptions import *
 import json
 
-_LOGGER = logging.getLogger(__name__)
 
-if _LOGGER.getEffectiveLevel() == 10:  # DEBUG
-    import http
-    http_client = logging.getLogger('urllib3.connectionpool')
-    http_client.setLevel(logging.INFO)
-    http.client.HTTPConnection.debuglevel = 1
-
-
-def check_response(resp):
-    if resp.status_code != 200:
-        raise SessionException(
-            'получен не корректный ответ от портала %s' % resp.status_code
-        )
-
-    j = resp.json()
-    print(json.dumps(j))
-    _LOGGER.debug(j)
-    if not j['success']:
-        if j['err_code'] == 201:
-            raise InvalidSession(
-                j['err_text']
-            )
-        raise SessionException(
-            'ошибка авторизации: %s' % j['err_text']
-        )
-
-    if 'data' not in j:
-        raise SessionException(
-            'не корректный ответ'
-        )
-
-    return j['data']
-
-
-def check_auth_response(resp):
-    if not resp:
-        raise SessionException(
-            'не корректный ответ'
-        )
-
-    data = resp[0]
-    if data['kd_result']:
-        raise SessionException(
-            'ошибка авторизации (%s): %s' % (data['kd_result'], data['nm_result'])
-        )
-
-    return data
+# _LOGGER = logging.getLogger(__name__)
+#
+# if _LOGGER.getEffectiveLevel() == 10:  # DEBUG
+#     import http
+#     http_client = logging.getLogger('urllib3.connectionpool')
+#     http_client.setLevel(logging.INFO)
+#     http.client.HTTPConnection.debuglevel = 1
 
 
 class Session:
@@ -62,6 +24,11 @@ class Session:
         self.password = password
         self.token = None
         self.id_profile = None
+        self.logger = logging.getLogger(__name__)
+        formatter = logging.Formatter(logging.BASIC_FORMAT)
+        st = logging.StreamHandler(sys.stdout)
+        st.setFormatter(formatter)
+        self.logger.addHandler(st)
 
     def __establish(self) -> None:
         self.__session = session()
@@ -79,9 +46,7 @@ class Session:
                 )
             }
         )
-        data = check_auth_response(resp)
-        # print(json.dumps(data))
-        # print(data['nm_result'])
+        data = self.check_auth_response(resp)
 
         self.token = data['session']
         self.id_profile = data['id_profile']
@@ -99,7 +64,9 @@ class Session:
         :type data: dict
         :return:
         """
-        _LOGGER.debug(f'query={query},action={action},data={data}')
+
+        self.logger.debug(f'query={query},action={action},data={data}')
+
         if not self.__session:
             self.__establish()
 
@@ -126,11 +93,50 @@ class Session:
                 raise SessionException(e)
 
         try:
-            return check_response(resp)
+            return self.check_response(resp)
         except InvalidSession as e:
             if kwargs.get('retry', False):
                 raise e
 
-            logging.info(f'сессия не валидна, нужно сделать переподключение ({e})')
+            self.logger.info(f'сессия не валидна, нужно сделать переподключение ({e})')
             self.__session = None
             return self.call(query=query, action=action, data=data, retry=True)
+
+    @staticmethod
+    def check_auth_response(resp):
+        if not resp:
+            raise SessionException(
+                'не корректный ответ'
+            )
+
+        data = resp[0]
+        if data['kd_result']:
+            raise SessionException(
+                'ошибка авторизации (%s): %s' % (data['kd_result'], data['nm_result'])
+            )
+
+        return data
+
+    def check_response(self, resp):
+        if resp.status_code != 200:
+            raise SessionException(
+                'получен не корректный ответ от портала %s' % resp.status_code
+            )
+
+        j = resp.json()
+        self.logger.debug(j)
+        if not j['success']:
+            if j['err_code'] == 201:
+                raise InvalidSession(
+                    j['err_text']
+                )
+            raise SessionException(
+                'ошибка авторизации: %s' % j['err_text']
+            )
+
+        if 'data' not in j:
+            raise SessionException(
+                'не корректный ответ'
+            )
+
+        return j['data']

@@ -1,9 +1,4 @@
-import json
-
 from mosenergosbyt.account import Account
-import logging
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class AccountException(BaseException):

@@ -1,8 +1,11 @@
+import sys
+
 from mosenergosbyt import Session, Accounts
 import argparse
 from datetime import datetime
 import json
 
+import logging
 
 
 def converter(obj):
@@ -28,7 +31,7 @@ def main():
     parser.add_argument('-p', '--password', required=True, type=str,
                         help='Пароль')
     parser.add_argument('-a', '--account', required=False, type=str, default="",
-                        help='Номер лицевого счета')
+                        help='Номер лицевого счета (обязательно для upload)')
     parser.add_argument('-e', '--with_counters', action='store_true',
                         help='Показывать информацию о счетчиках')
     parser.add_argument('-b', '--with_balance', action='store_true',
@@ -42,13 +45,18 @@ def main():
                         help='Передача показаний')
     parser.add_argument('-c', '--counter', type=str,
                         help='Номер счетчика для передачи (обязательно для upload)')
-    parser.add_argument('-v', '--counter_reading', type=float,
+    parser.add_argument('-r', '--counter_reading', type=float,
                         help='Показания счетчика для передачи (обязательно для upload)')
+
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Печатать отладочную информацию')
 
     args = parser.parse_args()
     try:
+        session = Session(login=args.login, password=args.password)
+        session.logger.setLevel('DEBUG' if args.verbose else 'INFO')
 
-        accounts = Accounts(Session(login=args.login, password=args.password))
+        accounts = Accounts(session)
         accounts.load(account=args.account,
                       with_counters=True if args.upload else args.with_counters,
                       with_balance=False if args.upload else args.with_balance,
@@ -56,25 +64,25 @@ def main():
                       period=args.period)
 
         if args.info:
-            print(toJson(accounts.get_list()))
+            session.logger.info(toJson(accounts.get_list()))
             exit(0)
 
         elif args.upload:
             account = accounts.get_account(args.account)
             if not account:
-                print(f'Информация о счете <{args.account}> не найдена')
+                session.logger.error(f'Информация о счете <{args.account}> не найдена')
                 exit(1)
 
             res = account.upload_reading(args.counter, args.counter_reading)
 
             if res:
-                print(res)
+                session.logger.error(res)
                 exit(1)
             else:
-                print("Показания переданы для аккаунта/счетчика %s / %s: %f" %
+                session.logger.info("Показания переданы для аккаунта/счетчика %s / %s: %f" %
                       (args.account, args.counter, args.counter_reading))
 
-    except SystemExit as e:
+    except SystemExit:
         pass
     except BaseException as e:
         print(e)

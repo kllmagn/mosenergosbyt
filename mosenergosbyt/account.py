@@ -1,12 +1,7 @@
-
 from datetime import datetime
 from time import strftime
 from mosenergosbyt.exceptions import *
-
-import logging
 from dateutil.relativedelta import relativedelta
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class Account:
@@ -44,7 +39,7 @@ class Account:
         try:
             data = self.__post_proxy_query(proxyquery="AbonentEquipment")
         except SessionTimeout:
-            _LOGGER.warning('произошел таймаут обращения к порталу при получении списка счетчиков')
+            self.session.logger.warning('произошел таймаут обращения к порталу при получении списка счетчиков')
             return []
 
         self.counters = data
@@ -54,7 +49,7 @@ class Account:
         try:
             data = self.__post_proxy_query(proxyquery='AbonentCurrentBalance')
         except SessionTimeout:
-            _LOGGER.warning('произошел таймаут обращения к порталу при получении баланса')
+            self.session.logger.warning('произошел таймаут обращения к порталу при получении баланса')
             return {}
         self.balance = data[0]
         return self.balance
@@ -73,7 +68,7 @@ class Account:
 
             data = self.__post_proxy_query(proxyquery='AbonentPays', proxyquerydata=querydata)
         except SessionTimeout:
-            _LOGGER.warning('произошел таймаут обращения к порталу при получении списка оплат')
+            self.session.logger.warning('произошел таймаут обращения к порталу при получении списка оплат')
             return []
 
         self.payments = data
