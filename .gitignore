@@ -2,8 +2,7 @@
 dist/
 build/
 mosenergosbyt/__pycache__
-MANIFEST
 tests
 .vscode
 mosenergosbyt.egg-info
-/venv/
+venv/
