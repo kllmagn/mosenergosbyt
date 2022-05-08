@@ -12,7 +12,7 @@ setup(
     maintainer='Alex Bratchik',
     maintainer_email='abratchik@gmail.com',
     url='https://gitflic.ru/project/alexbratchik/mosenergosbyt.git',
-    keywords=['mosenergosbyt', 'MEANINGFULL', 'KEYWORDS'],
+    keywords=['mosenergosbyt'],
     classifiers=[
         'Development Status :: 3 - Beta',
         'Intended Audience :: Developers',

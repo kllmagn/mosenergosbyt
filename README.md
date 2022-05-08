@@ -12,7 +12,7 @@ pip3 install git+https://gitflic.ru/project/alexbratchik/mosenergosbyt.git
 
 ## Использование из командной строки:
 ```
-mosenergosbyt [-h] [-i] -l LOGIN -p PASSWORD [-a ACCOUNT] [-e] [-b] [-y] [-o PERIOD] [-u] [-c COUNTER] [-v COUNTER_READING]
+mosenergosbyt [-h] [-i] -l LOGIN -p PASSWORD [-a ACCOUNT] [-e] [-b] [-y] [-o PERIOD] [-u] [-c COUNTER] [-r COUNTER_READING] [-v]
 
 параметры:
 
