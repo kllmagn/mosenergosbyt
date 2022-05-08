@@ -12,16 +12,18 @@ pip3 install git+https://gitflic.ru/project/alexbratchik/mosenergosbyt.git
 
 ## Использование из командной строки:
 ```
-> mosenergosbyt -h
-uusage: mosenergosbyt [-h] [-i] -l LOGIN -p PASSWORD [-a ACCOUNT] [-e] [-b] [-y] [-o PERIOD] [-u] [-c COUNTER] [-v COUNTER_READING]
+mosenergosbyt [-h] [-i] -l LOGIN -p PASSWORD [-a ACCOUNT] [-e] [-b] [-y] [-o PERIOD] [-u] [-c COUNTER] [-v COUNTER_READING]
 
+параметры:
+
+  -h, --help            show this help message and exit
   -i, --info            Получение информации
   -l LOGIN, --login LOGIN
                         Имя пользователя
   -p PASSWORD, --password PASSWORD
                         Пароль
   -a ACCOUNT, --account ACCOUNT
-                        Номер лицевого счета
+                        Номер лицевого счета (обязательно для upload)
   -e, --with_counters   Показывать информацию о счетчиках
   -b, --with_balance    Показывать информацию о балансе
   -y, --with_payments   Показывать информацию о платежах
@@ -30,8 +32,9 @@ uusage: mosenergosbyt [-h] [-i] -l LOGIN -p PASSWORD [-a ACCOUNT] [-e] [-b] [-y]
   -u, --upload          Передача показаний
   -c COUNTER, --counter COUNTER
                         Номер счетчика для передачи (обязательно для upload)
-  -v COUNTER_READING, --counter_reading COUNTER_READING
+  -r COUNTER_READING, --counter_reading COUNTER_READING
                         Показания счетчика для передачи (обязательно для upload)
+  -v, --verbose         Печатать отладочную информацию
 ```
 
 Загрузка данных с портала
