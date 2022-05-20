@@ -1,10 +1,5 @@
 from mosenergosbyt.account import Account
 
-
-class AccountException(BaseException):
-    pass
-
-
 class Accounts:
     def __init__(self, session):
         self.session = session

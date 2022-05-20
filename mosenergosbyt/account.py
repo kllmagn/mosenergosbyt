@@ -76,7 +76,7 @@ class Account:
 
         return self.payments
 
-    def upload_reading(self, nm_counter, reading) -> str:
+    def upload_reading(self, nm_counter, reading) -> list:
         """
         Передача показаний
         :param nm_counter: номер счета
@@ -90,10 +90,25 @@ class Account:
             return "Счетчик %s не найден для лицевого счета %s" % (nm_counter, self.nn_ls)
 
         counter = cns[0]
+        self.session.logger.info("uploading")
+        self.session.logger.info(counter)
+
+        querydata = {'dt_indication': self.__format_date(datetime.now()),
+                     'id_counter': counter['id_counter'],
+                     'id_counter_zn': counter['id_counter_zn'],
+                     'id_source': "15418",
+                     'pr_skip_anomaly': "0",
+                     'pr_skip_err': "0",
+                     'vl_indication': reading
+                     }
+
+        data = self.__post_proxy_query(proxy="AbonentSaveIndication", proxyquerydata=querydata, plugin="propagateMoeInd")
+
+        self.session.logger.info(data)
 
         return ""
 
-    def __post_proxy_query(self, proxyquery, proxyquerydata=None) -> dict:
+    def __post_proxy_query(self, proxyquery="", proxyquerydata=None, proxy="", plugin="") -> dict:
         """
         Запрос к порталу для получения списка оплат/переданных показаний
         :param proxyquery: тип запроса
@@ -101,16 +116,26 @@ class Account:
         :return:
         """
 
+        if proxy == "":
+            proxy = self.proxy
+
+        if plugin == "":
+            plugin = proxy
+
         if proxyquerydata is None:
             proxyquerydata = {}
 
+        if proxyquery:
+            proxyquerydata.update({
+                'proxyquery': proxyquery
+            })
+
         proxyquerydata.update({
-            'plugin': self.proxy,
-            'proxyquery': proxyquery,
+            'plugin': plugin,
             'vl_provider': self.vl_provider
         })
 
-        return self.session.call(self.proxy, data=proxyquerydata, timeout=5.0)
+        return self.session.call(proxy, data=proxyquerydata, timeout=5.0)
 
     @staticmethod
     def __format_date(d):
