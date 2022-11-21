@@ -3,7 +3,7 @@
 ## Установка
 
 ```
-pip3 install git+https://gitflic.ru/project/alexbratchik/mosenergosbyt.git
+pip3 install git+https://github.com/kllmagn/mosenergosbyt.git
 ```
 
 ВНИМАНИЕ! Данная версия библиотеки mosenergosbyt является экспериментальной, и может
